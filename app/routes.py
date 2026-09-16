@@ -35,6 +35,7 @@ def ingredients_to_text(recipe):
 # --- Startseite / Rezeptliste --------------------------------------------
 @app.route('/')
 @app.route('/index')
+@login_required
 def index():
     page = request.args.get('page', 1, type=int)
     q = request.args.get('q', '', type=str).strip()
@@ -99,6 +100,7 @@ def logout():
 
 # --- Rezepte: anzeigen, erfassen, bearbeiten, löschen ---------------------
 @app.route('/recipe/<int:id>', methods=['GET', 'POST'])
+@login_required
 def recipe(id):
     recipe = db.get_or_404(Recipe, id)
     portion_form = PortionForm()
