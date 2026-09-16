@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% import "bootstrap_wtf.html" as wtf %}
+{% block content %}
+<h1>{{ recipe.title }}</h1>
+<p class="text-body-secondary">
+  von <a href="{{ url_for('user', username=recipe.author.username) }}">{{ recipe.author.username }}</a>
+  · erstellt am {{ recipe.created_at.strftime('%d.%m.%Y') }}
+  {% if recipe.prep_time %}· {{ recipe.prep_time }} Minuten{% endif %}
+  {% if recipe.average_rating() %}· ★ {{ recipe.average_rating() }} von 5 ({{ recipe.ratings|length }} Bewertungen){% endif %}
+</p>
+{% if recipe.description %}<p class="lead">{{ recipe.description }}</p>{% endif %}
+
+<div class="row">
+  <div class="col-md-5">
+    <h3>Zutaten für {{ wanted }} Portionen</h3>
+    <!-- Portionsrechner (Geschäftslogik): Mengen werden serverseitig skaliert -->
+    <form method="post" class="row g-2 mb-3">
+      {{ portion_form.hidden_tag() }}
+      <div class="col-auto">{{ portion_form.portions(class='form-control', style='width:6em') }}</div>
+      <div class="col-auto">{{ portion_form.submit(class='btn btn-outline-primary') }}</div>
+    </form>
+    <table class="table table-sm">
+      {% for ing, amount in ingredients %}
+      <tr><td class="text-end">{{ ('%g' % amount) if amount is not none else '' }} {{ ing.unit or '' }}</td><td>{{ ing.name }}</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+  <div class="col-md-7">
+    <h3>Zubereitung</h3>
+    <p style="white-space: pre-line">{{ recipe.instructions }}</p>
+  </div>
+</div>
+
+{% if current_user == recipe.author %}
+<div class="d-flex gap-2 mb-4">
+  <a class="btn btn-secondary" href="{{ url_for('edit_recipe', id=recipe.id) }}">Bearbeiten</a>
+  <form method="post" action="{{ url_for('delete_recipe', id=recipe.id) }}" onsubmit="return confirm('Rezept wirklich löschen?')">
+    {{ delete_form.hidden_tag() }}
+    {{ delete_form.submit(class='btn btn-danger') }}
+  </form>
+</div>
+{% endif %}
+
+<h3>Bewertungen</h3>
+{% for r in recipe.ratings %}
+<div class="border-bottom py-2">
+  <strong>{{ r.user.username }}</strong> – {{ '★' * r.stars }}{{ '☆' * (5 - r.stars) }}
+  <br>{{ r.comment or '' }}
+</div>
+{% else %}
+<p>Noch keine Bewertungen.</p>
+{% endfor %}
+{% if current_user.is_authenticated and current_user != recipe.author %}
+<div class="col-md-5 mt-3">
+  <form method="post" action="{{ url_for('rate_recipe', id=recipe.id) }}" novalidate>
+    {{ rating_form.hidden_tag() }}
+    {{ wtf.form_field(rating_form.stars) }}
+    {{ wtf.form_field(rating_form.comment) }}
+    {{ rating_form.submit(class='btn btn-primary') }}
+  </form>
+</div>
+{% endif %}
+{% endblock %}

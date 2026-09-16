@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Profil von {{ user.username }}</h1>
+<p>Mitglied seit {{ user.created_at.strftime('%d.%m.%Y') }} · {{ recipes|length }} Rezepte</p>
+<ul class="list-group">
+  {% for r in recipes %}
+  <li class="list-group-item"><a href="{{ url_for('recipe', id=r.id) }}">{{ r.title }}</a></li>
+  {% else %}
+  <li class="list-group-item">Noch keine Rezepte.</li>
+  {% endfor %}
+</ul>
+{% endblock %}
