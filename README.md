@@ -29,5 +29,4 @@ http GET "http://localhost:5000/api/recipes/1?portions=8" "Authorization: Bearer
 Vollständige Dokumentation: siehe Praxisarbeit (PDF).
 
 ## Deployment
-Siehe `deploy/` (MySQL-Setup, Supervisor, Nginx) und Kapitel «Bereitstellung»
-in der Praxisarbeit.
+Siehe `deploy/` (MySQL-Setup, Supervisor, Nginx) 
